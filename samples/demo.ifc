@@ -1,0 +1,83 @@
+ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION(('ViewDefinition [CoordinationView]'),'2;1');
+FILE_NAME('demo.ifc','2026-04-08T00:00:00',('BIMoryn'),(''),'IfcOpenShell 0.7.0','BIMoryn Pilot Demo','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+
+/* ── Units ──────────────────────────────────────────────────── */
+#1=IFCSIUNIT(*,.LENGTHUNIT.,$,.METRE.);
+#2=IFCSIUNIT(*,.AREAUNIT.,$,.SQUARE_METRE.);
+#3=IFCSIUNIT(*,.VOLUMEUNIT.,$,.CUBIC_METRE.);
+#4=IFCSIUNIT(*,.PLANEANGLEUNIT.,$,.RADIAN.);
+#5=IFCUNITASSIGNMENT((#1,#2,#3,#4));
+
+/* ── Geometric context (TrueNorth intentionally omitted → GE-006) ─ */
+#6=IFCCARTESIANPOINT((0.,0.,0.));
+#7=IFCAXIS2PLACEMENT3D(#6,$,$);
+#8=IFCGEOMETRICREPRESENTATIONCONTEXT($,'Model',3,1.E-05,#7,$);
+
+/* ── Project ────────────────────────────────────────────────── */
+#9=IFCPROJECT('BIMorynPROJECT000001AA',$,'BIMoryn Demo Project',$,$,$,$,(#8),#5);
+
+/* ── Site ───────────────────────────────────────────────────── */
+#10=IFCCARTESIANPOINT((0.,0.,0.));
+#11=IFCAXIS2PLACEMENT3D(#10,$,$);
+#12=IFCLOCALPLACEMENT($,#11);
+#13=IFCSITE('BIMorynSITE0000000001A',$,'Site',$,$,#12,$,$,.ELEMENT.,$,$,$,$,$);
+
+/* ── Building ───────────────────────────────────────────────── */
+#14=IFCCARTESIANPOINT((0.,0.,0.));
+#15=IFCAXIS2PLACEMENT3D(#14,$,$);
+#16=IFCLOCALPLACEMENT(#12,#15);
+#17=IFCBUILDING('BIMorynBLDG0000000001A',$,'Main Building',$,$,#16,$,$,.ELEMENT.,$,$,$);
+
+/* ── Storey — name 'Level_01' violates NM-005 (expects L01) ─── */
+#18=IFCCARTESIANPOINT((0.,0.,0.));
+#19=IFCAXIS2PLACEMENT3D(#18,$,$);
+#20=IFCLOCALPLACEMENT(#16,#19);
+#21=IFCBUILDINGSTOREY('BIMorynSTREY000000001A',$,'Level_01',$,$,#20,$,$,.ELEMENT.,0.);
+
+/* ── Wall A: no Name → NM-001 ─────────────────────────────────
+   Also: no Pset_WallCommon.FireRating → PM-001
+         no Pset_WallCommon.IsExternal → ST-005               */
+#22=IFCCARTESIANPOINT((0.,0.,0.));
+#23=IFCAXIS2PLACEMENT3D(#22,$,$);
+#24=IFCLOCALPLACEMENT(#20,#23);
+#25=IFCWALL('BIMorynWALL1000000001A',$,$,$,$,#24,$,$,.NOTDEFINED.);
+
+/* ── Wall B: named, but still missing FireRating + IsExternal ── */
+#26=IFCCARTESIANPOINT((5.,0.,0.));
+#27=IFCAXIS2PLACEMENT3D(#26,$,$);
+#28=IFCLOCALPLACEMENT(#20,#27);
+#29=IFCWALL('BIMorynWALL2000000001A',$,'A-EXT-WALL-01',$,$,#28,$,$,.NOTDEFINED.);
+
+/* ── Space: no area quantity → PM-002; no LongName → NM-007 ─── */
+#30=IFCCARTESIANPOINT((1.,1.,0.));
+#31=IFCAXIS2PLACEMENT3D(#30,$,$);
+#32=IFCLOCALPLACEMENT(#20,#31);
+#33=IFCSPACE('BIMorynSPACE000000001A',$,'OFFICE_01',$,$,#32,$,$,.ELEMENT.,.INTERNAL.,$);
+
+/* ── Column: no LoadBearing → ST-001; no material → ST-002 ─── */
+#34=IFCCARTESIANPOINT((0.,5.,0.));
+#35=IFCAXIS2PLACEMENT3D(#34,$,$);
+#36=IFCLOCALPLACEMENT(#20,#35);
+#37=IFCCOLUMN('BIMorynCOLMN000000001A',$,'S-COL-01',$,$,#36,$,$,.COLUMN.);
+
+/* ── Slab: PredefinedType=NOTDEFINED → ST-003; no thickness → PM-007 */
+#38=IFCCARTESIANPOINT((0.,0.,0.));
+#39=IFCAXIS2PLACEMENT3D(#38,$,$);
+#40=IFCLOCALPLACEMENT(#20,#39);
+#41=IFCSLAB('BIMorynSLAB0000000001A',$,'A-FLR-SLAB-01',$,$,#40,$,$,.NOTDEFINED.);
+
+/* ── Spatial decomposition ──────────────────────────────────── */
+#50=IFCRELAGGREGATES('BIMorynRAGG1000000001A',$,$,$,#9,(#13));
+#51=IFCRELAGGREGATES('BIMorynRAGG2000000001A',$,$,$,#13,(#17));
+#52=IFCRELAGGREGATES('BIMorynRAGG3000000001A',$,$,$,#17,(#21));
+
+/* ── Element containment ────────────────────────────────────── */
+#53=IFCRELCONTAINEDINSPATIALSTRUCTURE('BIMorynRCNT0000000001A',$,$,$,(#25,#29,#33,#37,#41),#21);
+
+ENDSEC;
+END-ISO-10303-21;
