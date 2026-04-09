@@ -1,0 +1,46 @@
+name: Deploy to Render
+
+# Fires on every push to master/main once RENDER_DEPLOY_HOOK_URL is set
+# as a GitHub repo secret (Settings → Secrets → Actions).
+#
+# Setup (one-time, ~2 min):
+#   1. Create the Render service from render.yaml (connect repo at render.com)
+#   2. Copy the Deploy Hook URL from Render dashboard → Settings → Deploy Hook
+#   3. Add it as RENDER_DEPLOY_HOOK_URL in GitHub repo → Settings → Secrets
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:  # allow manual trigger from GitHub UI
+
+jobs:
+  deploy:
+    name: Trigger Render deploy
+    runs-on: ubuntu-latest
+    # Skip silently if the secret is not yet configured
+    if: vars.RENDER_DEPLOY_ENABLED == 'true' || secrets.RENDER_DEPLOY_HOOK_URL != ''
+    steps:
+      - name: Trigger Render deploy hook
+        run: |
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}")
+          echo "Render deploy hook response: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -ne 200 ] && [ "$HTTP_STATUS" -ne 201 ]; then
+            echo "Deploy hook returned unexpected status $HTTP_STATUS"
+            exit 1
+          fi
+
+      - name: Wait for health check
+        run: |
+          echo "Waiting 60s for Render to spin up..."
+          sleep 60
+          # Render assigns: https://<service-name>.onrender.com
+          # RENDER_API_URL must be set as a repo variable once URL is known
+          if [ -n "${{ vars.RENDER_API_URL }}" ]; then
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              "${{ vars.RENDER_API_URL }}/health")
+            echo "/health returned: $STATUS"
+            [ "$STATUS" -eq 200 ] || (echo "Health check failed" && exit 1)
+          else
+            echo "RENDER_API_URL not set — skipping live health check"
+          fi

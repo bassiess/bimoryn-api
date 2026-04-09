@@ -84,7 +84,18 @@ jobs:
     needs: test
     steps:
       - uses: actions/checkout@v4
-      - name: Build Docker image
+      - name: Build CLI Docker image
         run: docker build -t bimoryn:ci-test .
-      - name: Smoke test container
+      - name: Smoke test CLI container
         run: docker run --rm bimoryn:ci-test --help
+      - name: Build API Docker image
+        run: docker build -f Dockerfile.api -t bimoryn-api:ci-test .
+      - name: Smoke test API container health
+        run: |
+          docker run -d --name bimoryn-api-ci -p 8001:8000 bimoryn-api:ci-test
+          for i in $(seq 1 20); do
+            curl -sf http://localhost:8001/health && break || sleep 2
+          done
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8001/health)
+          [ "$STATUS" -eq 200 ] || (echo "API container health check failed: $STATUS" && exit 1)
+          docker stop bimoryn-api-ci
