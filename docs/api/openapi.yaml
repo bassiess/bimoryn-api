@@ -1,0 +1,336 @@
+openapi: "3.1.0"
+info:
+  title: BIMoryn Validation API
+  description: |
+    Rule-based BIM validation engine. Upload an IFC file and receive a
+    structured QA report (BCF-compatible JSON) with per-element issues,
+    severity levels, and a summary suitable for gating downstream workflows.
+  version: "0.1.0"
+  contact:
+    name: BIMoryn
+    email: hello@bimoryn.com
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+
+security:
+  - BearerAuth: []
+
+paths:
+  /health:
+    get:
+      operationId: health
+      summary: Liveness check
+      description: Returns 200 when the API is running. No authentication required.
+      tags: [system]
+      security: []
+      responses:
+        "200":
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                status: ok
+                version: "0.1.0"
+                rules_loaded: 35
+
+  /rules:
+    get:
+      operationId: listRules
+      summary: List all active validation rules
+      description: Returns all registered rules with id, name, category, severity, and description.
+      tags: [rules]
+      responses:
+        "200":
+          description: List of active rules
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RulesResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /validate:
+    post:
+      operationId: validate
+      summary: Validate an IFC file
+      description: |
+        Upload a `.ifc` file (multipart/form-data) and receive a full validation
+        report. The response JSON is identical to the CLI `--format json` output.
+
+        Use `summary.errors` to gate downstream processing — zero errors means
+        the model passed all required checks.
+      tags: [validation]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: IFC file to validate (.ifc)
+      responses:
+        "200":
+          description: Validation report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        Static API key. Set `BIMORYN_API_KEY` env var on the server.
+        If unset, authentication is disabled (local/dev mode).
+
+  responses:
+    Unauthorized:
+      description: Missing Authorization header
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: Unauthorized
+            code: AUTH_MISSING
+            details: Authorization header required
+
+    Forbidden:
+      description: Invalid API key
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: Forbidden
+            code: AUTH_INVALID
+            details: Invalid API key
+
+    BadRequest:
+      description: Invalid or missing IFC file
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: Bad Request
+            code: FILE_TYPE
+            details: Only .ifc files are accepted
+
+    UnprocessableEntity:
+      description: File could not be parsed as a valid IFC model
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: Unprocessable Entity
+            code: PARSE_ERROR
+            details: Not a valid IFC file
+
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status, version, rules_loaded]
+      properties:
+        status:
+          type: string
+          example: ok
+        version:
+          type: string
+          example: "0.1.0"
+        rules_loaded:
+          type: integer
+          example: 35
+
+    RuleInfo:
+      type: object
+      required: [id, name, category, severity, description]
+      properties:
+        id:
+          type: string
+          example: NM-001
+        name:
+          type: string
+          example: Missing element name
+        category:
+          $ref: "#/components/schemas/RuleCategory"
+        severity:
+          $ref: "#/components/schemas/Severity"
+        description:
+          type: string
+          example: Every IfcElement must have a non-empty Name attribute.
+
+    RulesResponse:
+      type: object
+      required: [count, rules]
+      properties:
+        count:
+          type: integer
+          example: 35
+        rules:
+          type: array
+          items:
+            $ref: "#/components/schemas/RuleInfo"
+
+    Severity:
+      type: string
+      enum: [error, warning, info]
+      description: |
+        - `error` — model cannot be used as-is
+        - `warning` — violates standard, needs review
+        - `info` — advisory, quality improvement
+
+    RuleCategory:
+      type: string
+      enum: [naming, parameters, geometry, structure, mep]
+
+    IssueStatus:
+      type: string
+      enum: [open, resolved, waived]
+
+    IssueLocation:
+      type: object
+      description: Spatial hint for BCF viewpoint (metres)
+      properties:
+        x:
+          type: number
+          nullable: true
+        y:
+          type: number
+          nullable: true
+        z:
+          type: number
+          nullable: true
+
+    Issue:
+      type: object
+      required: [rule_id, rule_name, category, severity, message, status]
+      properties:
+        rule_id:
+          type: string
+          example: NM-001
+        rule_name:
+          type: string
+          example: Missing element name
+        category:
+          $ref: "#/components/schemas/RuleCategory"
+        severity:
+          $ref: "#/components/schemas/Severity"
+        element_guid:
+          type: string
+          nullable: true
+          example: 2O2Fr$t4X7Zf8NOew3FL9r
+        element_type:
+          type: string
+          nullable: true
+          example: IfcWall
+        element_name:
+          type: string
+          nullable: true
+          example: Wall-001
+        message:
+          type: string
+          example: Element has no Name attribute
+        detail:
+          type: string
+          nullable: true
+          example: "Element type: IfcWall, GUID: 2O2Fr$t4X7Zf8NOew3FL9r"
+        location:
+          $ref: "#/components/schemas/IssueLocation"
+          nullable: true
+        status:
+          $ref: "#/components/schemas/IssueStatus"
+
+    ValidationSummary:
+      type: object
+      required: [total_elements, total_issues, errors, warnings, infos, rules_run, duration_ms]
+      properties:
+        total_elements:
+          type: integer
+          example: 312
+        total_issues:
+          type: integer
+          example: 14
+        errors:
+          type: integer
+          example: 3
+        warnings:
+          type: integer
+          example: 9
+        infos:
+          type: integer
+          example: 2
+        rules_run:
+          type: integer
+          example: 35
+        duration_ms:
+          type: number
+          example: 847.3
+
+    ValidationResult:
+      type: object
+      required: [run_id, model_path, started_at, summary, issues]
+      properties:
+        run_id:
+          type: string
+          format: uuid
+          example: a3f1c2d4-e5b6-7890-abcd-ef1234567890
+        model_path:
+          type: string
+          example: /tmp/model_abc123.ifc
+        schema:
+          type: string
+          nullable: true
+          example: IFC4
+        project_name:
+          type: string
+          nullable: true
+          example: Kantoorgebouw Utrecht
+        started_at:
+          type: string
+          format: date-time
+        summary:
+          $ref: "#/components/schemas/ValidationSummary"
+        issues:
+          type: array
+          items:
+            $ref: "#/components/schemas/Issue"
+        metadata:
+          type: object
+          additionalProperties: true
+
+    ErrorResponse:
+      type: object
+      required: [error, code]
+      properties:
+        error:
+          type: string
+          example: Bad Request
+        code:
+          type: string
+          example: FILE_TYPE
+        details:
+          type: string
+          nullable: true
+          example: Only .ifc files are accepted

@@ -135,6 +135,64 @@ bimoryn rules list --category geometry
 
 ---
 
+## REST API
+
+BIMoryn ships a lightweight HTTP API for programmatic integration — no CLI required.
+
+### Start the server
+
+```bash
+# Dev mode — no auth
+uvicorn bimoryn.api:app --host 0.0.0.0 --port 8000
+
+# Production — set an API key
+BIMORYN_API_KEY=your-secret-key uvicorn bimoryn.api:app --host 0.0.0.0 --port 8000
+```
+
+Interactive docs available at `http://localhost:8000/docs` once running.
+
+### Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/health` | Liveness check — no auth required |
+| `GET` | `/rules` | List all active rules |
+| `POST` | `/validate` | Validate an IFC file, receive JSON report |
+
+### Authentication
+
+Pass `Authorization: Bearer <BIMORYN_API_KEY>` on every request (except `/health`).
+If `BIMORYN_API_KEY` is unset, auth is disabled for local/dev use.
+
+### curl examples
+
+```bash
+# Health check
+curl http://localhost:8000/health
+
+# List rules
+curl -H "Authorization: Bearer your-secret-key" \
+     http://localhost:8000/rules
+
+# Validate an IFC file
+curl -X POST http://localhost:8000/validate \
+     -H "Authorization: Bearer your-secret-key" \
+     -F "file=@model.ifc" \
+     | python -m json.tool
+
+# Gate a CI pipeline — fail if any errors
+ERRORS=$(curl -s -X POST http://localhost:8000/validate \
+     -H "Authorization: Bearer your-secret-key" \
+     -F "file=@model.ifc" | python -c "import sys,json; print(json.load(sys.stdin)['summary']['errors'])")
+[ "$ERRORS" -eq 0 ] && echo "Model passed" || echo "Model has $ERRORS errors"
+```
+
+### OpenAPI spec
+
+Full spec at [`docs/api/openapi.yaml`](docs/api/openapi.yaml). Import into Postman, Insomnia, or any OpenAPI-compatible tool.
+
+---
+
 ## Output formats
 
 ### JSON (default)
@@ -161,6 +219,7 @@ bimoryn validate model.ifc --output issues.bcfzip --format bcf
 
 ```
 bimoryn/
+  api.py          — FastAPI REST API (POST /validate, GET /rules, GET /health)
   cli.py          — Typer CLI entry point
   engine.py       — Validation loop (IFC → rules → issues → result)
   models.py       — Data contracts (Issue, ValidationResult, RuleConfig)
@@ -174,6 +233,9 @@ bimoryn/
   output/
     json_report.py — JSON serialiser
     bcf.py         — BCF/ZIP exporter
+docs/
+  api/
+    openapi.yaml  — OpenAPI 3.1 spec
 samples/
   demo.ifc        — Intentionally flawed demo model (exercises all categories)
 ```
