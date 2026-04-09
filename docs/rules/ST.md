@@ -8,6 +8,7 @@ Structure rules validate that structural elements carry the data required for an
 
 **Severity:** WARNING (INFO if explicitly LoadBearing=False)
 **Category:** Structure
+**Standards:** ISO 19650-2:2018 §5.5.3 (structural analysis exchange requirements), General BIM hygiene
 
 **Checks:** `Pset_ColumnCommon.LoadBearing`
 
@@ -23,6 +24,7 @@ Columns without a LoadBearing flag will be excluded from structural analysis exp
 
 **Severity:** ERROR
 **Category:** Structure
+**Standards:** ISO 19650-2:2018 §5.5.3 (exchange information requirements), Rgd BIM Norm §5.2 (materiaalspecificatie structuur)
 
 **Applies to:** IfcBeam, IfcColumn, IfcMember, IfcFooting
 
@@ -38,6 +40,7 @@ Without a material association (`IfcRelAssociatesMaterial`), structural analysis
 
 **Severity:** WARNING
 **Category:** Structure
+**Standards:** ISO 16739-1:2018 §8.2 (IfcSlab.PredefinedType enumeration), General BIM hygiene
 
 `IfcSlab.PredefinedType` must be one of: `FLOOR`, `ROOF`, `LANDING`, `BASESLAB`. Each carries different structural implications. `NOTDEFINED` or `USERDEFINED` causes downstream analysis tools to misclassify the slab.
 
@@ -51,6 +54,7 @@ Without a material association (`IfcRelAssociatesMaterial`), structural analysis
 
 **Severity:** WARNING
 **Category:** Structure
+**Standards:** ISO 19650-2:2018 §5.5.3 (quantity take-off requirements), General BIM hygiene
 
 **Checks:** `Qto_FootingBaseQuantities.Depth`, `BaseQuantities.Depth`, or `Pset_FootingCommon.NominalDepth`
 
@@ -66,6 +70,7 @@ Foundation depth is required for earthwork quantity take-offs and geotechnical v
 
 **Severity:** WARNING
 **Category:** Structure
+**Standards:** ISO 19650-2:2018 §5.5.3 (exchange information requirements), Rgd BIM Norm §5.1 (gevel/schilidentificatie), NL BIM Loket §5.2 (buitenschil)
 
 **Checks:** `Pset_WallCommon.IsExternal`
 
@@ -81,6 +86,7 @@ The `IsExternal` flag distinguishes external walls (subject to weatherproofing, 
 
 **Severity:** WARNING
 **Category:** Structure
+**Standards:** ISO 16739-1:2018 §8.2 (IfcWall.PredefinedType enumeration), General BIM hygiene
 
 `IfcWall.PredefinedType` should be set to a meaningful value: `STANDARD`, `POLYGONAL`, `SHEAR`, `PARTITIONING`, `PLUMBINGWALL`, `MOVABLE`, or `SOLIDWALL`. `NOTDEFINED` prevents automated classification in structural and architectural analysis tools.
 

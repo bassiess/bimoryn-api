@@ -8,6 +8,7 @@ MEP rules validate that mechanical, electrical, and plumbing elements are correc
 
 **Severity:** ERROR
 **Category:** MEP
+**Standards:** ISO 19650-2:2018 §5.5.3 (exchange information requirements), ISO 16739-1:2018 §8.5 (IfcSystem grouping)
 
 Every `IfcDistributionFlowElement` (ducts, pipes, fittings, equipment) must belong to an `IfcSystem` or `IfcDistributionSystem`. Unassigned elements are invisible to system-based clash detection, O&M handover, and commissioning workflows.
 
@@ -21,6 +22,7 @@ Every `IfcDistributionFlowElement` (ducts, pipes, fittings, equipment) must belo
 
 **Severity:** WARNING
 **Category:** MEP
+**Standards:** General BIM hygiene (incomplete MEP routing; no specific clause)
 
 `IfcDistributionPort` instances not in any `IfcRelConnectsPorts` relationship represent open (unfinished) connections. This typically indicates incomplete routing or a connection lost during export.
 
@@ -36,6 +38,7 @@ Every `IfcDistributionFlowElement` (ducts, pipes, fittings, equipment) must belo
 
 **Severity:** ERROR
 **Category:** MEP
+**Standards:** ISO 19650-2:2018 §5.5.3 (exchange information requirements), NL BIM Loket BIMQ-I §4.3 (MEP element properties)
 
 **Checks:** `Pset_DuctSegmentTypeCommon.NominalWidth`, `.NominalHeight`, `.NominalDiameter`, or `Qto_DuctSegmentBaseQuantities.CrossSectionArea`
 
@@ -51,6 +54,7 @@ Duct segments without size data cannot be used in airflow calculations, coordina
 
 **Severity:** ERROR
 **Category:** MEP
+**Standards:** ISO 19650-2:2018 §5.5.3 (exchange information requirements), NL BIM Loket BIMQ-I §4.3 (MEP element properties)
 
 **Checks:** `Pset_PipeSegmentTypeCommon.NominalDiameter` or `.OutsideDiameter`
 
@@ -66,6 +70,7 @@ Pipes without a diameter cannot be used in flow calculations, clashing against i
 
 **Severity:** WARNING
 **Category:** MEP
+**Standards:** General BIM hygiene (airflow modelling prerequisite; no specific clause)
 
 Flow terminals (diffusers, grilles, sanitary fixtures) should have at least one `IfcDistributionPort` with a defined `FlowDirection` (SOURCE, SINK, or SOURCEANDSINK). This property drives airflow modelling and commissioning documentation.
 
@@ -79,6 +84,7 @@ Flow terminals (diffusers, grilles, sanitary fixtures) should have at least one 
 
 **Severity:** WARNING
 **Category:** MEP
+**Standards:** General BIM hygiene (electrical safety classification; no specific ISO 19650 clause)
 
 **Checks:** `Pset_CableCarrierSegmentTypeCommon.NominalVoltageRating` or `Pset_ElectricalDeviceCommon.NominalVoltage`
 

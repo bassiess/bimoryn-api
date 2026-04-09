@@ -8,6 +8,7 @@ Parameter rules verify that elements carry the required property sets and quanti
 
 **Severity:** WARNING
 **Category:** Parameters
+**Standards:** ISO 19650-2:2018 §5.5.3 (exchange information requirements), Rgd BIM Norm §5.1 (brandveiligheid documentatie), NL BIM Loket §5.2 (brandwerende scheidingen)
 
 **Checks:** `Pset_WallCommon.FireRating`
 
@@ -23,6 +24,7 @@ Fire rating is required for fire compartmentation schedules, regulatory submissi
 
 **Severity:** ERROR
 **Category:** Parameters
+**Standards:** ISO 19650-2:2018 §5.5.3 (quantity take-off requirements), NL BIM Loket §4.4 (vloeroppervlakten), Rgd BIM Norm §4.3 (gebruiksoppervlak)
 
 **Checks:** `Qto_SpaceBaseQuantities.NetFloorArea`, `.GrossFloorArea`, or any area quantity
 
@@ -38,6 +40,7 @@ Floor area is essential for GFA calculations, lettable area schedules, and regul
 
 **Severity:** WARNING
 **Category:** Parameters
+**Standards:** ISO 19650-2:2018 §5.5.3 (structural analysis exchange requirements), General BIM hygiene
 
 **Applies to:** IfcWall, IfcSlab, IfcColumn, IfcBeam, IfcMember, IfcFooting
 **Checks:** `Pset_{Type}Common.LoadBearing`
@@ -54,6 +57,7 @@ The LoadBearing flag distinguishes structural from non-structural elements. With
 
 **Severity:** INFO
 **Category:** Parameters
+**Standards:** General BIM hygiene (door schedule completeness; no specific standard clause)
 
 Doors should reference an ironmongery/hardware property set for door schedule generation and specification. The check looks for any property set with "hardware" or "ironmongery" in its name.
 
@@ -67,6 +71,7 @@ Doors should reference an ironmongery/hardware property set for door schedule ge
 
 **Severity:** ERROR
 **Category:** Parameters
+**Standards:** ISO 19650-2:2018 §5.5.3 (spatial structure requirements), ISO 16739-1:2018 §8.3 (IfcRelContainedInSpatialStructure)
 
 **Applies to:** IfcWall, IfcSlab, IfcColumn, IfcBeam, IfcDoor, IfcWindow, IfcStair, IfcRamp, IfcRoof, IfcFurnishingElement, IfcDistributionElement
 
@@ -82,6 +87,7 @@ Every physical element must be contained in an `IfcBuildingStorey` via `IfcRelCo
 
 **Severity:** INFO
 **Category:** Parameters
+**Standards:** ISO 19650-2:2018 §5.5.3 (classification system requirements), NL BIM Loket §4.5 (NL-SfB classificatie), UK BIM Framework §4.3 (Uniclass 2015)
 
 **Applies to:** IfcWall, IfcSlab, IfcColumn, IfcBeam, IfcDoor, IfcWindow, IfcSpace, IfcDistributionElement
 
@@ -97,6 +103,7 @@ Elements should carry at least one `IfcRelAssociatesClassification` link to a re
 
 **Severity:** WARNING
 **Category:** Parameters
+**Standards:** ISO 19650-2:2018 §5.5.3 (quantity take-off requirements), Rgd BIM Norm §5.2 (vloerdikte opgave)
 
 **Checks:** `Pset_SlabCommon.NominalThickness`, `Qto_SlabBaseQuantities.Depth`, or `BaseQuantities.Depth`
 
@@ -112,6 +119,7 @@ Slab thickness is required for structural analysis, material take-offs, and U-va
 
 **Severity:** WARNING
 **Category:** Parameters
+**Standards:** ISO 19650-2:2018 §5.3.1 (project information — authorship), ISO 19650-1:2018 §5.6 (information management roles), NL BIM Loket §3.1 (modelverantwoordelijkheid)
 
 **Checks:** `IfcProject.OwnerHistory.OwningUser.ThePerson` and `IfcProject.OwnerHistory.OwningOrganization`
 

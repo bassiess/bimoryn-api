@@ -9,6 +9,7 @@ Most GE rules operate on IFC attributes only — no geometry kernel required.
 
 **Severity:** ERROR
 **Category:** Geometry
+**Standards:** ISO 16739-1:2018 §5.1.5 (IfcRoot.GlobalId uniqueness), ISO 19650-1:2018 §5.7 (information coordination)
 
 Every IFC element must have a unique GlobalId. Duplicate GUIDs corrupt BCF topic references, break clash detection tools, and cause unpredictable behaviour when federating models.
 
@@ -22,6 +23,7 @@ Every IFC element must have a unique GlobalId. Duplicate GUIDs corrupt BCF topic
 
 **Severity:** ERROR
 **Category:** Geometry
+**Standards:** General BIM hygiene (no specific standard clause; model quality prerequisite for downstream use)
 
 **Checks:** `Qto_WallBaseQuantities.Length`
 
@@ -43,6 +45,7 @@ Walls shorter than 50 mm (configurable via `min_length_m`) are modelling artefac
 
 **Severity:** WARNING
 **Category:** Geometry
+**Standards:** ISO 19650-2:2018 §5.5.3 (spatial breakdown structure), ISO 16739-1:2018 §8.3 (IfcRelContainedInSpatialStructure)
 
 Physical `IfcElement` instances must be associated to the spatial structure via `IfcRelContainedInSpatialStructure` (or aggregated). Uncontained elements are invisible in storey-based views, schedule filters, and cost take-offs.
 
@@ -58,6 +61,7 @@ Excludes annotation types: `IfcAnnotation`, `IfcGrid`, `IfcVirtualElement`.
 
 **Severity:** WARNING
 **Category:** Geometry
+**Standards:** General BIM hygiene (modelling artefact; no specific clause)
 
 Walls sharing an identical `ObjectPlacement` origin (rounded to 1 mm) are likely duplicates created by copy-paste without moving. This inflates quantities and causes rendering artefacts.
 
@@ -71,6 +75,7 @@ Walls sharing an identical `ObjectPlacement` origin (rounded to 1 mm) are likely
 
 **Severity:** WARNING
 **Category:** Geometry
+**Standards:** ISO 16739-1:2018 §6.3 (IfcOpeningElement must reference IfcRelVoidsElement)
 
 An `IfcOpeningElement` not attached via `IfcRelVoidsElement` is orphaned — it represents a void in no wall or slab. Usually caused by deleting a door/window without cleaning up the associated void.
 
@@ -84,6 +89,7 @@ An `IfcOpeningElement` not attached via `IfcRelVoidsElement` is orphaned — it 
 
 **Severity:** INFO
 **Category:** Geometry
+**Standards:** ISO 19650-2:2018 §5.3.1 (project setup — coordinate reference), Rgd BIM Norm §3.2 (project coordinate system)
 
 The `IfcGeometricRepresentationContext` should declare a `TrueNorth` direction. Without it the model cannot be correctly oriented for site coordination, solar analysis, or energy simulation.
 
@@ -97,6 +103,7 @@ The `IfcGeometricRepresentationContext` should declare a `TrueNorth` direction. 
 
 **Severity:** WARNING
 **Category:** Geometry
+**Standards:** ISO 19650-2:2018 §5.5.3 (spatial coordination), Rgd BIM Norm §3.2 (project origin definition)
 
 Elements placed exactly at (0, 0, 0) in world coordinates are almost always a mis-export or unplaced element. In federated models this causes all elements to pile up at the site origin, breaking coordination.
 

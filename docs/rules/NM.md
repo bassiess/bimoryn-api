@@ -8,6 +8,7 @@ Naming rules enforce element naming conventions that enable reliable coordinatio
 
 **Severity:** WARNING
 **Category:** Naming
+**Standards:** ISO 19650-2:2018 §5.5.3 (exchange information requirements), NL BIM Loket §4.1 (element naming)
 
 **Applies to:** IfcWall, IfcSlab, IfcColumn, IfcBeam, IfcDoor, IfcWindow, IfcSpace, IfcStair, IfcRamp, IfcRoof, IfcDistributionElement, IfcBuildingElementProxy
 
@@ -23,6 +24,7 @@ The `Name` attribute must be non-empty. Unnamed elements cause blank rows in sch
 
 **Severity:** WARNING (ERROR if blank)
 **Category:** Naming
+**Standards:** ISO 19650-2:2018 §5.3.1 (project information setup), NL BIM Loket §4.2 (space naming), Rgd BIM Norm §4.1 (ruimtenaam vereisten)
 
 Space names must match the configured regex pattern. The default pattern allows alphanumeric names with dashes, slashes, and spaces, up to 50 characters.
 
@@ -42,6 +44,7 @@ Space names must match the configured regex pattern. The default pattern allows 
 
 **Severity:** INFO
 **Category:** Naming
+**Standards:** NL BIM Loket §4.1 (discipline-prefixed naming convention), General BIM hygiene
 
 `IfcTypeObject` names should start with a recognised discipline prefix: `A-` (Architecture), `S-` (Structure), `M-` (Mechanical), `E-` (Electrical), `P-` (Plumbing), `C-` (Civil), `L-` (Landscape).
 
@@ -61,6 +64,7 @@ Space names must match the configured regex pattern. The default pattern allows 
 
 **Severity:** ERROR
 **Category:** Naming
+**Standards:** ISO 19650-2:2018 §5.5.3 (unique element identification for BCF coordination)
 
 Door and window marks (Tag or Name) must be unique across the model. Duplicate marks corrupt door/window schedules and make element identification in BCF impossible.
 
@@ -74,6 +78,7 @@ Door and window marks (Tag or Name) must be unique across the model. Duplicate m
 
 **Severity:** WARNING (ERROR if blank)
 **Category:** Naming
+**Standards:** ISO 19650-2:2018 §5.3.1 (spatial breakdown structure naming), Rgd BIM Norm §4.2 (verdiepingsaanduiding), NL BIM Loket §4.2 (bouwlaagnaam)
 
 Building storey names should follow a recognisable floor pattern. Default accepted formats: `B2`, `B1`, `GF`, `L01`–`L99`, `RF`, `M01`, `UG`, `SB`, `P01`–`P99`, `Ground`, `Basement`, `Roof`.
 
@@ -93,6 +98,7 @@ Building storey names should follow a recognisable floor pattern. Default accept
 
 **Severity:** WARNING
 **Category:** Naming
+**Standards:** General BIM hygiene (authoring tool cleanup before delivery; no specific clause)
 
 Type names that look like Revit or ArchiCAD defaults (e.g. "Basic Wall", "Generic - 200mm", "Default", "<unnamed>") indicate the model was not properly cleaned up before export.
 
@@ -108,6 +114,7 @@ Type names that look like Revit or ArchiCAD defaults (e.g. "Basic Wall", "Generi
 
 **Severity:** INFO
 **Category:** Naming
+**Standards:** ISO 19650-2:2018 §5.5.3 (handover documentation completeness), Rgd BIM Norm §4.1 (ruimteomschrijving)
 
 `IfcSpace` elements should carry either a `LongName` or `Description` to support room-book generation and handover documentation.
 
@@ -121,6 +128,7 @@ Type names that look like Revit or ArchiCAD defaults (e.g. "Basic Wall", "Generi
 
 **Severity:** INFO
 **Category:** Naming
+**Standards:** ISO 19650-2:2018 §5.4.2 (software and format requirements), ISO 16739-1:2018 (IFC4 is current standard)
 
 The model uses the IFC2x3 schema. IFC4 is the current standard and offers significantly improved property set coverage, quantity take-offs, and MEP connectivity. Several BIMoryn rules have reduced coverage on IFC2x3 models.
 
