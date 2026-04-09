@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: bimoryn-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile.api
+    region: frankfurt  # closest to NL/BE/DE pilot market
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: BIMORYN_API_KEY
+        sync: false  # set manually in Render dashboard → Environment
+    autoDeploy: true
