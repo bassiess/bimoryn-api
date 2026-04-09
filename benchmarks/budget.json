@@ -1,0 +1,18 @@
+{
+  "_comment": "Performance budget for BIMoryn validation engine. These are INITIAL baselines — tighten after pilot data.",
+  "small": {
+    "elements_target": 100,
+    "max_duration_ms": 5000,
+    "max_memory_mb": 100
+  },
+  "medium": {
+    "elements_target": 1000,
+    "max_duration_ms": 30000,
+    "max_memory_mb": 300
+  },
+  "large": {
+    "elements_target": 5000,
+    "max_duration_ms": 120000,
+    "max_memory_mb": 1000
+  }
+}

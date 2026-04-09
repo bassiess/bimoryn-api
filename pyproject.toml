@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "bimoryn"
+version = "0.1.0"
+description = "BIM validation engine — rule-based QA for IFC models"
+requires-python = ">=3.11"
+dependencies = [
+    "ifcopenshell>=0.7.0",
+    "pydantic>=2.0",
+    "typer>=0.12",
+    "lxml>=5.0",
+    "rich>=13.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov",
+]
+bench = [
+    "rich>=13.0",
+]
+
+[project.scripts]
+bimoryn = "bimoryn.cli:app"
+bimoryn-bench = "benchmarks.run_benchmarks:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["bimoryn*", "benchmarks*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
