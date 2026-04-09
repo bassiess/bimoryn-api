@@ -1,0 +1,13 @@
+.git
+.github
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+dist/
+build/
+benchmarks/fixtures/
+benchmarks/results/
+tests/
+docs/
+*.md
