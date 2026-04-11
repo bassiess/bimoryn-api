@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BIMoryn — Pilot Onboarding</title>
+  <style>
+    :root {
+      --navy: #1A2B4A;
+      --orange: #FF6B35;
+      --orange-light: #FF8C5A;
+      --bg: #F7F8FA;
+      --white: #FFFFFF;
+      --text: #2C3E50;
+      --muted: #6B7A8D;
+      --border: #E2E8F0;
+      --code-bg: #0F1D32;
+      --code-text: #E2E8F0;
+      --success: #27AE60;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* Header */
+    header {
+      background: var(--navy);
+      color: var(--white);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    header h1 span { color: var(--orange); }
+
+    .badge {
+      margin-left: auto;
+      background: var(--orange);
+      color: var(--white);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, #243B5E 100%);
+      color: var(--white);
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+
+    .hero h2 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .hero h2 em {
+      color: var(--orange);
+      font-style: normal;
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: #B0BEC5;
+      max-width: 560px;
+      margin: 0 auto 2rem;
+    }
+
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--orange);
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: #90A4AE;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Main layout */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+    }
+
+    /* Section */
+    section {
+      margin-bottom: 2.5rem;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--orange);
+      display: inline-block;
+    }
+
+    /* Card */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 0.75rem;
+    }
+
+    /* API URL */
+    .api-url-box {
+      background: var(--navy);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .api-url-box code {
+      color: var(--orange);
+      font-size: 1.05rem;
+      font-family: 'SF Mono', 'Consolas', monospace;
+      font-weight: 600;
+      word-break: break-all;
+    }
+
+    .copy-btn {
+      background: var(--orange);
+      color: var(--white);
+      border: none;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .copy-btn:hover { background: var(--orange-light); }
+
+    /* API Key */
+    .api-key-box {
+      background: #F0F4FF;
+      border: 1px solid #C7D2FE;
+      border-left: 4px solid var(--navy);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .api-key-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.25rem;
+    }
+
+    .api-key-value {
+      font-family: 'SF Mono', 'Consolas', monospace;
+      font-size: 0.95rem;
+      color: var(--navy);
+      font-weight: 600;
+      word-break: break-all;
+    }
+
+    /* Code blocks */
+    .code-block {
+      background: var(--code-bg);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+
+    .code-header {
+      background: rgba(255,255,255,0.05);
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .code-label {
+      font-size: 0.75rem;
+      color: #90A4AE;
+      font-family: 'SF Mono', 'Consolas', monospace;
+    }
+
+    .code-block pre {
+      padding: 1rem 1.25rem;
+      overflow-x: auto;
+      font-family: 'SF Mono', 'Consolas', monospace;
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: var(--code-text);
+    }
+
+    .code-block pre .comment { color: #64748B; }
+    .code-block pre .url { color: #93C5FD; }
+    .code-block pre .key { color: #F59E0B; }
+    .code-block pre .value { color: #86EFAC; }
+
+    /* Steps */
+    .steps {
+      counter-reset: step;
+      list-style: none;
+    }
+
+    .steps li {
+      counter-increment: step;
+      padding: 1rem 1rem 1rem 4rem;
+      position: relative;
+      border-left: 2px solid var(--border);
+      margin-left: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: -1.5rem;
+      top: 0.9rem;
+      width: 3rem;
+      height: 3rem;
+      background: var(--navy);
+      color: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .steps li:last-child { border-left: 2px solid transparent; }
+
+    /* Endpoints table */
+    .endpoints {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .endpoints th {
+      text-align: left;
+      padding: 0.6rem 1rem;
+      background: var(--navy);
+      color: var(--white);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .endpoints th:first-child { border-radius: 8px 0 0 0; }
+    .endpoints th:last-child { border-radius: 0 8px 0 0; }
+
+    .endpoints td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+      vertical-align: top;
+    }
+
+    .endpoints tr:hover td { background: #F8FAFF; }
+
+    .method {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-family: 'SF Mono', 'Consolas', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .method-get { background: #DCFCE7; color: #166534; }
+    .method-post { background: #DBEAFE; color: #1E40AF; }
+
+    .endpoint-path {
+      font-family: 'SF Mono', 'Consolas', monospace;
+      font-size: 0.85rem;
+      color: var(--navy);
+    }
+
+    .auth-required {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* Callout */
+    .callout {
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+
+    .callout-info {
+      background: #EFF6FF;
+      border-left: 4px solid #3B82F6;
+    }
+
+    .callout-warn {
+      background: #FFFBEB;
+      border-left: 4px solid #F59E0B;
+    }
+
+    .callout-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.1rem; }
+
+    .callout-text { font-size: 0.9rem; color: var(--text); }
+    .callout-text strong { color: var(--navy); }
+
+    /* Footer */
+    footer {
+      background: var(--navy);
+      color: #90A4AE;
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.85rem;
+    }
+
+    footer a { color: var(--orange); text-decoration: none; }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .hero h2 { font-size: 1.75rem; }
+      .hero-stats { gap: 1.5rem; }
+      header { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <svg class="logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="20,2 36,11 36,29 20,38 4,29 4,11" fill="#FF6B35" opacity="0.15" stroke="#FF6B35" stroke-width="1.5"/>
+    <rect x="10" y="14" width="20" height="3" rx="1.5" fill="#FF6B35"/>
+    <rect x="10" y="19" width="20" height="3" rx="1.5" fill="white" opacity="0.7"/>
+    <rect x="10" y="24" width="14" height="3" rx="1.5" fill="white" opacity="0.4"/>
+  </svg>
+  <h1>BIM<span>oryn</span></h1>
+  <span class="badge">Pilot</span>
+</header>
+
+<div class="hero">
+  <h2>Welcome to the<br><em>BIMoryn Pilot</em></h2>
+  <p>Automated IFC model validation — 35 rules, 5 categories, results in under 60ms. Everything you need to get started is on this page.</p>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-value">35</div>
+      <div class="stat-label">Validation Rules</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">&lt;60ms</div>
+      <div class="stat-label">Per Model</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">5</div>
+      <div class="stat-label">Categories</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">ISO</div>
+      <div class="stat-label">19650 Mapped</div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- API BASE URL -->
+  <section>
+    <div class="section-title">API Endpoint</div>
+    <div class="api-url-box">
+      <code id="api-url">https://bimoryn-api.onrender.com</code>
+      <button class="copy-btn" onclick="copy('https://bimoryn-api.onrender.com', this)">Copy URL</button>
+    </div>
+    <div class="callout callout-warn" style="margin-top:0.75rem">
+      <span class="callout-icon">&#9200;</span>
+      <div class="callout-text"><strong>Cold start:</strong> The API runs on Render's free tier. The first request after 15 min of inactivity may take ~20–30 seconds. Subsequent requests are fast (&lt;60ms).</div>
+    </div>
+  </section>
+
+  <!-- API KEY -->
+  <section>
+    <div class="section-title">Your API Key</div>
+    <div class="card">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
+        <div>
+          <div class="api-key-label">Bearer Token</div>
+          <div class="api-key-value" id="api-key">bim_uLNkHebLnRbIXnJYi8LFeMBt</div>
+        </div>
+        <button class="copy-btn" onclick="copy('bim_uLNkHebLnRbIXnJYi8LFeMBt', this)" style="margin-top:0.25rem;">Copy Key</button>
+      </div>
+      <p style="margin-top:0.75rem; font-size:0.85rem; color:var(--muted);">
+        Include this in every request as: <code style="background:#F0F4FF; padding:0.1rem 0.4rem; border-radius:4px; font-size:0.83rem;">Authorization: Bearer bim_uLNkHebLnRbIXnJYi8LFeMBt</code>
+      </p>
+    </div>
+  </section>
+
+  <!-- QUICK START -->
+  <section>
+    <div class="section-title">Quick Start</div>
+
+    <div class="card">
+      <h3>1 — Health check (no auth required)</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre>curl <span class="url">https://bimoryn-api.onrender.com/health</span>
+
+<span class="comment"># Expected response:</span>
+<span class="value">{"status": "ok", "version": "0.1.0", "rules_loaded": 35}</span></pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>2 — List all validation rules</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre>curl <span class="url">https://bimoryn-api.onrender.com/rules</span> \
+  -H <span class="value">"Authorization: Bearer bim_uLNkHebLnRbIXnJYi8LFeMBt"</span></pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>3 — Validate an IFC model</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre>curl -X POST <span class="url">https://bimoryn-api.onrender.com/validate</span> \
+  -H <span class="value">"Authorization: Bearer bim_uLNkHebLnRbIXnJYi8LFeMBt"</span> \
+  -F <span class="key">"file=@your-model.ifc"</span>
+
+<span class="comment"># Pass/fail gate: summary.errors === 0 means model is handover-ready</span></pre>
+      </div>
+    </div>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">&#128196;</span>
+      <div class="callout-text">Full interactive API documentation at <a href="https://bimoryn-api.onrender.com/docs" target="_blank" style="color:var(--navy); font-weight:600;">bimoryn-api.onrender.com/docs</a></div>
+    </div>
+  </section>
+
+  <!-- ENDPOINTS -->
+  <section>
+    <div class="section-title">API Endpoints</div>
+    <div class="card" style="padding:0; overflow:hidden;">
+      <table class="endpoints">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Path</th>
+            <th>Description</th>
+            <th>Auth</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="method method-get">GET</span></td>
+            <td class="endpoint-path">/health</td>
+            <td>Service health + version</td>
+            <td class="auth-required">—</td>
+          </tr>
+          <tr>
+            <td><span class="method method-post">POST</span></td>
+            <td class="endpoint-path">/validate</td>
+            <td>Validate an IFC file (multipart)</td>
+            <td class="auth-required">Bearer</td>
+          </tr>
+          <tr>
+            <td><span class="method method-get">GET</span></td>
+            <td class="endpoint-path">/rules</td>
+            <td>List all 35 active rules</td>
+            <td class="auth-required">Bearer</td>
+          </tr>
+          <tr>
+            <td><span class="method method-get">GET</span></td>
+            <td class="endpoint-path">/docs</td>
+            <td>Interactive OpenAPI docs (Swagger UI)</td>
+            <td class="auth-required">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ONBOARDING STEPS -->
+  <section>
+    <div class="section-title">Getting Started in 3 Steps</div>
+    <div class="card">
+      <ol class="steps">
+        <li>
+          <strong>Verify the API is live</strong><br>
+          <span style="color:var(--muted); font-size:0.9rem;">Run the health check above. If it times out the first time, wait 30s and retry — the service is waking up.</span>
+        </li>
+        <li>
+          <strong>Upload your first IFC model</strong><br>
+          <span style="color:var(--muted); font-size:0.9rem;">Use the <code style="background:#F0F4FF; padding:0.1rem 0.3rem; border-radius:3px; font-size:0.83rem;">POST /validate</code> endpoint with any IFC4 or IFC2x3 file. The response includes per-rule issues with element references.</span>
+        </li>
+        <li>
+          <strong>Review results &amp; share feedback</strong><br>
+          <span style="color:var(--muted); font-size:0.9rem;">Check <code style="background:#F0F4FF; padding:0.1rem 0.3rem; border-radius:3px; font-size:0.83rem;">summary.errors</code> for the pass/fail signal. Email us any questions or rule suggestions — we iterate fast.</span>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- RULE CATEGORIES -->
+  <section>
+    <div class="section-title">Rule Categories (35 Rules)</div>
+    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:1rem;">
+      <div class="card" style="text-align:center; padding:1.25rem 1rem;">
+        <div style="font-size:1.75rem; margin-bottom:0.5rem;">&#9881;</div>
+        <div style="font-weight:700; color:var(--navy);">Geometry</div>
+        <div style="font-size:0.8rem; color:var(--muted);">Openings, clashes, volumes</div>
+      </div>
+      <div class="card" style="text-align:center; padding:1.25rem 1rem;">
+        <div style="font-size:1.75rem; margin-bottom:0.5rem;">&#127968;</div>
+        <div style="font-weight:700; color:var(--navy);">Structure</div>
+        <div style="font-size:0.8rem; color:var(--muted);">Storeys, spaces, containment</div>
+      </div>
+      <div class="card" style="text-align:center; padding:1.25rem 1rem;">
+        <div style="font-size:1.75rem; margin-bottom:0.5rem;">&#128272;</div>
+        <div style="font-weight:700; color:var(--navy);">Naming</div>
+        <div style="font-size:0.8rem; color:var(--muted);">Identifiers, naming conventions</div>
+      </div>
+      <div class="card" style="text-align:center; padding:1.25rem 1rem;">
+        <div style="font-size:1.75rem; margin-bottom:0.5rem;">&#128203;</div>
+        <div style="font-weight:700; color:var(--navy);">Parameters</div>
+        <div style="font-size:0.8rem; color:var(--muted);">Required properties, psets</div>
+      </div>
+      <div class="card" style="text-align:center; padding:1.25rem 1rem;">
+        <div style="font-size:1.75rem; margin-bottom:0.5rem;">&#128268;</div>
+        <div style="font-weight:700; color:var(--navy);">MEP</div>
+        <div style="font-size:0.8rem; color:var(--muted);">Systems, connectivity, routing</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUPPORT -->
+  <section>
+    <div class="section-title">Support</div>
+    <div class="card">
+      <p style="font-size:0.95rem;">Questions, issues, or rule suggestions — email us at <a href="mailto:hello@bimoryn.com" style="color:var(--orange); font-weight:600;">hello@bimoryn.com</a>. We respond within 1 business day.</p>
+      <p style="margin-top:0.75rem; font-size:0.85rem; color:var(--muted);">BIMoryn v0.1.0 — IFC4 / IFC2x3 — ISO 19650 / NL BIM Loket / Rgd BIM Norm</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p><strong style="color:var(--white);">BIMoryn</strong> — Automated BIM Validation &nbsp;|&nbsp; <a href="https://bimoryn-api.onrender.com/docs">API Docs</a> &nbsp;|&nbsp; <a href="mailto:hello@bimoryn.com">hello@bimoryn.com</a></p>
+  <p style="margin-top:0.5rem;">Pilot program — all feedback welcome</p>
+</footer>
+
+<script>
+  function copy(text, btn) {
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      btn.style.background = '#27AE60';
+      setTimeout(() => {
+        btn.textContent = orig;
+        btn.style.background = '';
+      }, 2000);
+    });
+  }
+
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    const text = pre.textContent;
+    copy(text, btn);
+  }
+</script>
+
+</body>
+</html>
