@@ -1,6 +1,6 @@
 # BIM basis ILS compliance automatiseren: zo werkt het onder de motorkap
 
-*Pillar: Standaarden | Door: CTO BIM Boost | Status: Draft voor review*
+*Pillar: Standaarden | Door: CTO BIMoryn | Status: Draft voor review*
 
 ---
 
@@ -115,7 +115,7 @@ Maar in de praktijk zijn de meeste ILS-fouten niet inhoudelijk fout. Ze zijn sim
 
 ## Integratie in de handoverworkflow
 
-De typische workflow met BIM Boost voor ILS-compliance:
+De typische workflow met BIMoryn voor ILS-compliance:
 
 1. **Upload model** (IFC4 of IFC2x3) via CLI of API
 2. **Run engine** met de relevante ruleset (of alle 35 checks)
@@ -138,7 +138,7 @@ Dit is waar we naartoe bouwen. De architectuur ondersteunt het al — elke rule 
 **Wil je een ILS-compliance check op je eigen model?**
 We bouwen pilotpartner-specifieke rulesets voor de eerste deelnemers.
 
-[→ Meld je aan als pilotpartner](https://bimboost.io/pilot)
+[→ Meld je aan als pilotpartner](https://bimoryn.com/pilot)
 
 ---
 

@@ -1,6 +1,6 @@
-# Van 5 naar 40 validation rules: hoe we de BIM Boost engine opschalen
+# Van 5 naar 40 validation rules: hoe we de BIMoryn engine opschalen
 
-*Pillar: Bouw | Door: CTO BIM Boost | Status: Draft voor review*
+*Pillar: Bouw | Door: CTO BIMoryn | Status: Draft voor review*
 
 ---
 
@@ -18,7 +18,7 @@ Wij besloten dat anders te doen.
 
 ## De architectuur: regels als eerste-klas objecten
 
-De kern van de BIM Boost engine is een `Rule`-basisklasse. Elke validatieregel erft daarvan en implementeert één methode: `check(model, config)`.
+De kern van de BIMoryn engine is een `Rule`-basisklasse. Elke validatieregel erft daarvan en implementeert één methode: `check(model, config)`.
 
 ```python
 class Rule:
@@ -132,7 +132,7 @@ De architectuur maakt dit mogelijk. Dat was de investering die we bewust vroeg h
 **Wil je de volledige rule-bibliotheek zien of je eigen conventie-checks toevoegen?**
 We bespreken dit graag met de eerste pilotpartners.
 
-[→ Plan een technisch gesprek](https://bimboost.io/pilot)
+[→ Plan een technisch gesprek](https://bimoryn.com/pilot)
 
 ---
 

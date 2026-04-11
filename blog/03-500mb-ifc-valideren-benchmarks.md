@@ -1,6 +1,6 @@
 # Hoe snel kun je een 500MB IFC-model valideren? Benchmarks uit de praktijk
 
-*Pillar: Proof | Door: CTO BIM Boost | Status: Draft voor review — benchmarkdata wordt aangevuld zodra BIM-16 compleet is*
+*Pillar: Proof | Door: CTO BIMoryn | Status: Draft voor review — benchmarkdata wordt aangevuld zodra BIM-16 compleet is*
 
 ---
 
@@ -81,7 +81,7 @@ Een typische handmatige QA-check op een middelgroot IFC-model (een compleet gebo
 
 Totaal: een halve tot hele werkdag per model, per milestone.
 
-Met de BIM Boost engine:
+Met de BIMoryn engine:
 
 - **Engine run**: < 30 seconden (zie budgetten boven)
 - **JSON/BCF output**: direct beschikbaar
@@ -126,7 +126,7 @@ En het levert jou: een gratis validatiescan van je huidige model, met volledig r
 **Geinteresseerd in deelname als pilotpartner?**
 We zoeken BIM-coordinatoren en projectmanagers bij ontwikkelaars, aannemers en ingenieursbureaus.
 
-[→ Meld je aan voor de pilot](https://bimboost.io/pilot)
+[→ Meld je aan voor de pilot](https://bimoryn.com/pilot)
 
 ---
 

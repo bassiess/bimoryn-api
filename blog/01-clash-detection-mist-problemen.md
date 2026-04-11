@@ -1,6 +1,6 @@
 # Waarom de meeste BIM clash detection tools 80% van de problemen missen
 
-*Pillar: Probleem | Door: CTO BIM Boost | Status: Draft voor review*
+*Pillar: Probleem | Door: CTO BIMoryn | Status: Draft voor review*
 
 ---
 
@@ -48,7 +48,7 @@ Goede BIM-validatie werkt als een linter voor code. Net zoals een Python-linter 
 
 Concreet betekent dat: regels per discipline, per use case, per leverfase.
 
-Bij BIM Boost hebben we dit opgebouwd als een rule-engine met 35 checks verdeeld over 5 categorieen:
+Bij BIMoryn hebben we dit opgebouwd als een rule-engine met 35 checks verdeeld over 5 categorieen:
 
 | Categorie   | Aantal regels | Voorbeelden |
 |-------------|--------------|-------------|
@@ -87,7 +87,7 @@ Dat is precies wat we bouwen.
 **Wil je zien hoeveel issues er in jouw huidige projectmodellen zitten?**
 We runnen een gratis validatiescan voor pilotpartners — geen installatie vereist, binnen 24 uur resultaat.
 
-[→ Meld je aan als pilotpartner](https://bimboost.io/pilot)
+[→ Meld je aan als pilotpartner](https://bimoryn.com/pilot)
 
 ---
 
