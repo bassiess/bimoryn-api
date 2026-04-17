@@ -1,12 +1,17 @@
-name: Deploy to Render
+name: Deploy to Fly.io
 
-# Fires on every push to master/main once RENDER_DEPLOY_HOOK_URL is set
+# Fires on every push to master/main once FLY_API_TOKEN is set
 # as a GitHub repo secret (Settings → Secrets → Actions).
 #
-# Setup (one-time, ~2 min):
-#   1. Create the Render service from render.yaml (connect repo at render.com)
-#   2. Copy the Deploy Hook URL from Render dashboard → Settings → Deploy Hook
-#   3. Add it as RENDER_DEPLOY_HOOK_URL in GitHub repo → Settings → Secrets
+# Setup (one-time, ~5 min — board only):
+#   1. Go to https://fly.io → sign up / log in (free tier, no credit card for first deploy)
+#   2. Go to: https://fly.io/user/personal_access_tokens → create a token
+#   3. In GitHub repo → Settings → Secrets → Actions → New repository secret
+#      Name: FLY_API_TOKEN   Value: <paste token>
+#   4. Push any commit to master → workflow deploys automatically
+#   5. Live URL: https://bimoryn-api.fly.dev/health → should return {"status":"ok"}
+#
+# No CLI needed. No dashboard connection. No credit card required for MVP traffic.
 
 on:
   push:
@@ -15,32 +20,35 @@ on:
 
 jobs:
   deploy:
-    name: Trigger Render deploy
+    name: Deploy to Fly.io
     runs-on: ubuntu-latest
     # Skip silently if the secret is not yet configured
-    if: vars.RENDER_DEPLOY_ENABLED == 'true' || secrets.RENDER_DEPLOY_HOOK_URL != ''
-    steps:
-      - name: Trigger Render deploy hook
-        run: |
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}")
-          echo "Render deploy hook response: $HTTP_STATUS"
-          if [ "$HTTP_STATUS" -ne 200 ] && [ "$HTTP_STATUS" -ne 201 ]; then
-            echo "Deploy hook returned unexpected status $HTTP_STATUS"
-            exit 1
-          fi
+    if: secrets.FLY_API_TOKEN != ''
 
-      - name: Wait for health check
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to Fly.io
+        run: flyctl deploy --remote-only --dockerfile Dockerfile.api
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Set API key secret on Fly.io
+        run: flyctl secrets set BIMORYN_API_KEY=bim_uLNkHebLnRbIXnJYi8LFeMBt --app bimoryn-api
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Health check
         run: |
-          echo "Waiting 60s for Render to spin up..."
-          sleep 60
-          # Render assigns: https://<service-name>.onrender.com
-          # RENDER_API_URL must be set as a repo variable once URL is known
-          if [ -n "${{ vars.RENDER_API_URL }}" ]; then
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-              "${{ vars.RENDER_API_URL }}/health")
-            echo "/health returned: $STATUS"
-            [ "$STATUS" -eq 200 ] || (echo "Health check failed" && exit 1)
-          else
-            echo "RENDER_API_URL not set — skipping live health check"
-          fi
+          echo "Waiting 30s for Fly.io to finalize rollout..."
+          sleep 30
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://bimoryn-api.fly.dev/health)
+          echo "/health returned: $STATUS"
+          [ "$STATUS" -eq 200 ] || (echo "Health check failed — check Fly.io dashboard" && exit 1)
+
+      - name: Print live URL
+        run: echo "API live at https://bimoryn-api.fly.dev"
