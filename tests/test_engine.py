@@ -6,14 +6,12 @@ to assert that specific rules fire (or don't fire) correctly.
 
 from __future__ import annotations
 
-import pytest
 import ifcopenshell
 import ifcopenshell.api
 
 from bimoryn.engine import Engine, EngineConfig
-from bimoryn.models import Severity, RuleCategory
+from bimoryn.models import Severity
 from bimoryn.rules import REGISTRY
-
 
 # ---------------------------------------------------------------------------
 # Registry sanity

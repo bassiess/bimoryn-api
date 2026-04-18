@@ -19,7 +19,6 @@ Usage::
 from __future__ import annotations
 
 import argparse
-import sys
 import time
 import uuid
 from pathlib import Path
@@ -27,7 +26,6 @@ from pathlib import Path
 import ifcopenshell
 import ifcopenshell.api
 import ifcopenshell.guid
-
 
 ROOT = Path(__file__).parent
 
