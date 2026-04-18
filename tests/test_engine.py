@@ -60,10 +60,10 @@ def test_nm001_clean_model_no_false_positives(tmp_path):
     storey   = ifcopenshell.api.run("root.create_entity", model, ifc_class="IfcBuildingStorey", name="L01")
     wall     = ifcopenshell.api.run("root.create_entity", model, ifc_class="IfcWall", name="EXT-WALL-001")
 
-    ifcopenshell.api.run("aggregate.assign_object", model, relating_object=project, product=site)
-    ifcopenshell.api.run("aggregate.assign_object", model, relating_object=site, product=building)
-    ifcopenshell.api.run("aggregate.assign_object", model, relating_object=building, product=storey)
-    ifcopenshell.api.run("spatial.assign_container", model, relating_structure=storey, product=wall)
+    ifcopenshell.api.run("aggregate.assign_object", model, relating_object=project, products=[site])
+    ifcopenshell.api.run("aggregate.assign_object", model, relating_object=site, products=[building])
+    ifcopenshell.api.run("aggregate.assign_object", model, relating_object=building, products=[storey])
+    ifcopenshell.api.run("spatial.assign_container", model, relating_structure=storey, products=[wall])
 
     ifc_path = tmp_path / "named.ifc"
     model.write(str(ifc_path))

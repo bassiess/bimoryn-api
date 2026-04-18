@@ -29,9 +29,9 @@ def _base_model(schema="IFC4"):
     site     = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcSite", name="Site")
     building = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcBuilding", name="Bldg")
     storey   = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcBuildingStorey", name="L01")
-    ifcopenshell.api.run("aggregate.assign_object", m, relating_object=project, product=site)
-    ifcopenshell.api.run("aggregate.assign_object", m, relating_object=site, product=building)
-    ifcopenshell.api.run("aggregate.assign_object", m, relating_object=building, product=storey)
+    ifcopenshell.api.run("aggregate.assign_object", m, relating_object=project, products=[site])
+    ifcopenshell.api.run("aggregate.assign_object", m, relating_object=site, products=[building])
+    ifcopenshell.api.run("aggregate.assign_object", m, relating_object=building, products=[storey])
     return m
 
 
@@ -61,7 +61,7 @@ def test_ge002_fires_on_zero_length_wall(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     wall = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcWall", name="StubWall")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=wall)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[wall])
 
     # Add Qto_WallBaseQuantities with Length=0
     qset = m.create_entity("IfcElementQuantity", GlobalId=_guid(),
@@ -79,7 +79,7 @@ def test_ge002_no_false_positive_on_normal_wall(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     wall = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcWall", name="W1")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=wall)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[wall])
 
     qset = m.create_entity("IfcElementQuantity", GlobalId=_guid(),
                             Name="Qto_WallBaseQuantities")
@@ -109,7 +109,7 @@ def test_ge003_no_false_positive_on_contained_wall(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     wall = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcWall", name="W")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=wall)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[wall])
 
     issues = _issues_for("GE-003", m, tmp_path)
     assert issues == []
@@ -125,8 +125,11 @@ def test_ge004_fires_on_same_placement(tmp_path):
 
     def _wall_at_origin(name):
         w = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcWall", name=name)
-        ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=w)
-        # Both walls get default placement at (0,0,0)
+        ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[w])
+        # Explicitly place both walls at (0,0,0) so the duplicate-placement rule fires
+        origin = m.create_entity("IfcCartesianPoint", Coordinates=[0.0, 0.0, 0.0])
+        axis2p = m.create_entity("IfcAxis2Placement3D", Location=origin)
+        w.ObjectPlacement = m.create_entity("IfcLocalPlacement", RelativePlacement=axis2p)
         return w
 
     _wall_at_origin("WA")
@@ -153,7 +156,7 @@ def test_ge005_no_false_positive_on_hosted_opening(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     wall = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcWall", name="W")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=wall)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[wall])
 
     opening = m.create_entity("IfcOpeningElement", GlobalId=_guid(), Name="V1")
     m.create_entity("IfcRelVoidsElement", GlobalId=_guid(),
@@ -200,7 +203,7 @@ def test_ge007_no_false_positive_on_placed_element(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     wall = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcWall", name="W")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=wall)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[wall])
 
     loc = m.create_entity("IfcCartesianPoint", Coordinates=(5.0, 3.0, 0.0))
     axis = m.create_entity("IfcAxis2Placement3D", Location=loc)
@@ -219,7 +222,7 @@ def test_nm002_fires_on_invalid_space_name(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     space = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcSpace", name="  !!BAD NAME!!")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=space)
+    ifcopenshell.api.run("aggregate.assign_object", m, products=[space], relating_object=storey)
 
     issues = _issues_for("NM-002", m, tmp_path)
     assert len(issues) >= 1
@@ -229,7 +232,7 @@ def test_nm002_no_false_positive_on_valid_name(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     space = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcSpace", name="Office-01")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=space)
+    ifcopenshell.api.run("aggregate.assign_object", m, products=[space], relating_object=storey)
 
     issues = _issues_for("NM-002", m, tmp_path)
     assert issues == []
@@ -244,7 +247,7 @@ def test_nm004_fires_on_duplicate_door_mark(tmp_path):
     storey = m.by_type("IfcBuildingStorey")[0]
     for _ in range(2):
         door = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcDoor", name="D-001")
-        ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=door)
+        ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[door])
 
     issues = _issues_for("NM-004", m, tmp_path)
     assert len(issues) >= 2
@@ -255,7 +258,7 @@ def test_nm004_no_false_positive_on_unique_marks(tmp_path):
     storey = m.by_type("IfcBuildingStorey")[0]
     for i in range(3):
         door = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcDoor", name=f"D-{i:03d}")
-        ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=door)
+        ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[door])
 
     issues = _issues_for("NM-004", m, tmp_path)
     assert issues == []
@@ -309,7 +312,7 @@ def test_nm007_fires_on_space_without_description(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     space = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcSpace", name="S-01")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=space)
+    ifcopenshell.api.run("aggregate.assign_object", m, products=[space], relating_object=storey)
 
     issues = _issues_for("NM-007", m, tmp_path)
     assert len(issues) >= 1
@@ -320,7 +323,7 @@ def test_nm007_no_false_positive_when_longname_set(tmp_path):
     storey = m.by_type("IfcBuildingStorey")[0]
     space = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcSpace", name="S-01")
     space.LongName = "Serverruimte"
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=space)
+    ifcopenshell.api.run("aggregate.assign_object", m, products=[space], relating_object=storey)
 
     issues = _issues_for("NM-007", m, tmp_path)
     assert issues == []
@@ -332,7 +335,9 @@ def test_nm007_no_false_positive_when_longname_set(tmp_path):
 
 def test_nm008_fires_on_ifc2x3(tmp_path):
     m = ifcopenshell.file(schema="IFC2X3")
-    ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcProject", name="P")
+    # Use create_entity directly to avoid owner-history requirement in ifcopenshell 0.8+
+    import uuid as _uuid
+    m.create_entity("IfcProject", GlobalId=ifcopenshell.guid.compress(_uuid.uuid4().hex), Name="P")
 
     issues = _issues_for("NM-008", m, tmp_path)
     assert len(issues) >= 1
@@ -352,7 +357,7 @@ def test_pm001_fires_on_wall_without_fire_rating(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     wall = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcWall", name="W")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=wall)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[wall])
 
     issues = _issues_for("PM-001", m, tmp_path)
     assert len(issues) >= 1
@@ -362,7 +367,7 @@ def test_pm001_no_false_positive_when_fire_rating_set(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     wall = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcWall", name="W")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=wall)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[wall])
 
     pset = ifcopenshell.api.run("pset.add_pset", m, product=wall, name="Pset_WallCommon")
     ifcopenshell.api.run("pset.edit_pset", m, pset=pset, properties={"FireRating": "EI 60"})
@@ -379,7 +384,7 @@ def test_pm002_fires_on_space_without_area(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     space = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcSpace", name="Rm")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=space)
+    ifcopenshell.api.run("aggregate.assign_object", m, products=[space], relating_object=storey)
 
     issues = _issues_for("PM-002", m, tmp_path)
     assert len(issues) >= 1
@@ -393,7 +398,7 @@ def test_pm003_fires_on_column_without_loadbearing(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     col = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcColumn", name="C1")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=col)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[col])
 
     issues = _issues_for("PM-003", m, tmp_path)
     assert len(issues) >= 1
@@ -403,7 +408,7 @@ def test_pm003_no_false_positive_when_loadbearing_set(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     col = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcColumn", name="C1")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=col)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[col])
 
     pset = ifcopenshell.api.run("pset.add_pset", m, product=col, name="Pset_ColumnCommon")
     ifcopenshell.api.run("pset.edit_pset", m, pset=pset, properties={"LoadBearing": True})
@@ -428,7 +433,7 @@ def test_pm005_no_false_positive_on_assigned_wall(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     wall = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcWall", name="W")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=wall)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[wall])
 
     issues = _issues_for("PM-005", m, tmp_path)
     assert issues == []
@@ -442,7 +447,7 @@ def test_pm006_fires_on_unclassified_wall(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     wall = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcWall", name="W")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=wall)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[wall])
 
     issues = _issues_for("PM-006", m, tmp_path)
     assert len(issues) >= 1
@@ -452,9 +457,9 @@ def test_pm006_no_false_positive_when_classified(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     wall = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcWall", name="W")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=wall)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[wall])
 
-    cl_ref = m.create_entity("IfcClassificationReference", GlobalId=_guid(),
+    cl_ref = m.create_entity("IfcClassificationReference",
                               Identification="Ss_20_10", Name="Walls")
     m.create_entity("IfcRelAssociatesClassification", GlobalId=_guid(),
                     RelatedObjects=[wall], RelatingClassification=cl_ref)
@@ -471,7 +476,7 @@ def test_pm007_fires_on_slab_without_thickness(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     slab = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcSlab", name="S1")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=slab)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[slab])
 
     issues = _issues_for("PM-007", m, tmp_path)
     assert len(issues) >= 1
@@ -481,7 +486,7 @@ def test_pm007_no_false_positive_when_thickness_set(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     slab = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcSlab", name="S1")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=slab)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[slab])
 
     pset = ifcopenshell.api.run("pset.add_pset", m, product=slab, name="Pset_SlabCommon")
     ifcopenshell.api.run("pset.edit_pset", m, pset=pset, properties={"NominalThickness": 200.0})
@@ -511,7 +516,7 @@ def test_st001_fires_on_column_no_loadbearing(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     col = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcColumn", name="C1")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=col)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[col])
 
     issues = _issues_for("ST-001", m, tmp_path)
     assert len(issues) >= 1
@@ -525,7 +530,7 @@ def test_st002_fires_on_beam_without_material(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     beam = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcBeam", name="B1")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=beam)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[beam])
 
     issues = _issues_for("ST-002", m, tmp_path)
     assert len(issues) >= 1
@@ -535,10 +540,10 @@ def test_st002_no_false_positive_when_material_set(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     beam = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcBeam", name="B1")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=beam)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[beam])
 
     mat = ifcopenshell.api.run("material.add_material", m, name="Steel S355")
-    ifcopenshell.api.run("material.assign_material", m, product=beam, material=mat)
+    ifcopenshell.api.run("material.assign_material", m, products=[beam], material=mat)
 
     issues = _issues_for("ST-002", m, tmp_path)
     assert issues == []
@@ -553,7 +558,7 @@ def test_st003_fires_on_undefined_slab_type(tmp_path):
     storey = m.by_type("IfcBuildingStorey")[0]
     slab = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcSlab", name="S1")
     slab.PredefinedType = "NOTDEFINED"
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=slab)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[slab])
 
     issues = _issues_for("ST-003", m, tmp_path)
     assert len(issues) >= 1
@@ -564,7 +569,7 @@ def test_st003_no_false_positive_on_floor_slab(tmp_path):
     storey = m.by_type("IfcBuildingStorey")[0]
     slab = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcSlab", name="S1")
     slab.PredefinedType = "FLOOR"
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=slab)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[slab])
 
     issues = _issues_for("ST-003", m, tmp_path)
     assert issues == []
@@ -578,7 +583,7 @@ def test_st005_fires_on_wall_without_isexternal(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     wall = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcWall", name="W")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=wall)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[wall])
 
     issues = _issues_for("ST-005", m, tmp_path)
     assert len(issues) >= 1
@@ -588,7 +593,7 @@ def test_st005_no_false_positive_when_isexternal_set(tmp_path):
     m = _base_model()
     storey = m.by_type("IfcBuildingStorey")[0]
     wall = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcWall", name="W")
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=wall)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[wall])
 
     pset = ifcopenshell.api.run("pset.add_pset", m, product=wall, name="Pset_WallCommon")
     ifcopenshell.api.run("pset.edit_pset", m, pset=pset, properties={"IsExternal": True})
@@ -606,7 +611,7 @@ def test_st006_fires_on_notdefined_wall(tmp_path):
     storey = m.by_type("IfcBuildingStorey")[0]
     wall = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcWall", name="W")
     wall.PredefinedType = "NOTDEFINED"
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=wall)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[wall])
 
     issues = _issues_for("ST-006", m, tmp_path)
     assert len(issues) >= 1
@@ -617,7 +622,7 @@ def test_st006_no_false_positive_on_standard_wall(tmp_path):
     storey = m.by_type("IfcBuildingStorey")[0]
     wall = ifcopenshell.api.run("root.create_entity", m, ifc_class="IfcWall", name="W")
     wall.PredefinedType = "STANDARD"
-    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, product=wall)
+    ifcopenshell.api.run("spatial.assign_container", m, relating_structure=storey, products=[wall])
 
     issues = _issues_for("ST-006", m, tmp_path)
     assert issues == []

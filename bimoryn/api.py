@@ -29,7 +29,6 @@ from pydantic import BaseModel
 
 from bimoryn.engine import Engine
 from bimoryn.models import RuleCategory, Severity, ValidationResult
-from bimoryn.output.json_report import to_json_str
 from bimoryn.rules import REGISTRY
 
 # ---------------------------------------------------------------------------

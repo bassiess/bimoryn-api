@@ -19,10 +19,10 @@ from __future__ import annotations
 import io
 import uuid
 import zipfile
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
-from xml.etree.ElementTree import Element, SubElement, tostring, indent
+from xml.etree.ElementTree import Element, SubElement, indent, tostring
 
 from bimoryn.models import Issue, Severity, ValidationResult
 

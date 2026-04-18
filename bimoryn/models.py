@@ -6,12 +6,11 @@ BCF exporter) depend only on these types — never on internal engine state.
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any
-from datetime import datetime, timezone
 
 from pydantic import BaseModel, Field
-
 
 # ---------------------------------------------------------------------------
 # Enums

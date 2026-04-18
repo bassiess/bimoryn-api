@@ -21,7 +21,6 @@ import ifcopenshell
 
 from bimoryn.models import (
     Issue,
-    RuleCategory,
     RuleConfig,
     Severity,
     ValidationResult,

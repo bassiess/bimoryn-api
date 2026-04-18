@@ -29,9 +29,9 @@ def minimal_model() -> ifcopenshell.file:
     building = ifcopenshell.api.run("root.create_entity", model, ifc_class="IfcBuilding", name="Building")
     storey   = ifcopenshell.api.run("root.create_entity", model, ifc_class="IfcBuildingStorey", name="L01")
 
-    ifcopenshell.api.run("aggregate.assign_object", model, relating_object=project,  product=site)
-    ifcopenshell.api.run("aggregate.assign_object", model, relating_object=site,     product=building)
-    ifcopenshell.api.run("aggregate.assign_object", model, relating_object=building, product=storey)
+    ifcopenshell.api.run("aggregate.assign_object", model, relating_object=project,  products=[site])
+    ifcopenshell.api.run("aggregate.assign_object", model, relating_object=site,     products=[building])
+    ifcopenshell.api.run("aggregate.assign_object", model, relating_object=building, products=[storey])
 
     return model
 
@@ -42,7 +42,7 @@ def model_with_unnamed_wall(minimal_model) -> ifcopenshell.file:
     model = minimal_model
     wall = ifcopenshell.api.run("root.create_entity", model, ifc_class="IfcWall", name="")
     storey = model.by_type("IfcBuildingStorey")[0]
-    ifcopenshell.api.run("spatial.assign_container", model, relating_structure=storey, product=wall)
+    ifcopenshell.api.run("spatial.assign_container", model, relating_structure=storey, products=[wall])
     return model
 
 
@@ -61,7 +61,7 @@ def model_with_duplicate_guid(minimal_model) -> ifcopenshell.file:
     wall2.GlobalId = shared_guid
 
     for w in [wall1, wall2]:
-        ifcopenshell.api.run("spatial.assign_container", model, relating_structure=storey, product=w)
+        ifcopenshell.api.run("spatial.assign_container", model, relating_structure=storey, products=[w])
 
     return model
 

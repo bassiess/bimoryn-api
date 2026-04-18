@@ -10,14 +10,12 @@ Usage:
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 from typing import Annotated, Optional
 
 import typer
 from rich.console import Console
 from rich.table import Table
-from rich import print as rprint
 
 from bimoryn.engine import Engine, EngineConfig
 from bimoryn.models import Severity
