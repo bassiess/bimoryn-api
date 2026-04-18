@@ -37,10 +37,19 @@ jobs:
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
-      - name: Set API key secret on Fly.io
-        run: flyctl secrets set BIMORYN_API_KEY=bim_uLNkHebLnRbIXnJYi8LFeMBt --app bimoryn-api
+      - name: Set API keys on Fly.io
+        run: |
+          flyctl secrets set \
+            BIMORYN_API_KEY=bim_uLNkHebLnRbIXnJYi8LFeMBt \
+            "BIMORYN_API_KEYS=bim_t74Tg3r6lWFsrfmQrsKTjJsH-HmEgZDg,bim_KeksgC3JBVsNFPHTYLjaUO4UialTvG4x,bim_ecXinXqS1mUV5skAIATmoNuyDgLUKNvu,bim_7QPQLoREnybgMWUveeW8IazueOd2QFt2" \
+            --app bimoryn-api
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        # Per-pilot key assignments:
+        #   bim_t74Tg3r6lWFsrfmQrsKTjJsH-HmEgZDg — Andrii Bondarenko
+        #   bim_KeksgC3JBVsNFPHTYLjaUO4UialTvG4x — Manoe Singh
+        #   bim_ecXinXqS1mUV5skAIATmoNuyDgLUKNvu — Victoria Werner
+        #   bim_7QPQLoREnybgMWUveeW8IazueOd2QFt2 — Younes Hasnaoui
 
       - name: Health check
         run: |

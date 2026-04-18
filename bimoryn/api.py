@@ -54,12 +54,31 @@ _engine = Engine()
 # Auth
 # ---------------------------------------------------------------------------
 
-_API_KEY = os.environ.get("BIMORYN_API_KEY", "")
+def _load_valid_keys() -> set[str]:
+    """Load all valid API keys from environment.
+
+    Supports two env vars:
+    - BIMORYN_API_KEY   — single key (legacy / default)
+    - BIMORYN_API_KEYS  — comma-separated list (per-pilot keys)
+
+    When neither is set, auth is disabled (local/dev mode).
+    """
+    keys: set[str] = set()
+    single = os.environ.get("BIMORYN_API_KEY", "").strip()
+    if single:
+        keys.add(single)
+    multi = os.environ.get("BIMORYN_API_KEYS", "").strip()
+    if multi:
+        keys.update(k.strip() for k in multi.split(",") if k.strip())
+    return keys
+
+
+_VALID_KEYS = _load_valid_keys()
 
 
 async def _require_auth(authorization: Annotated[str | None, Header()] = None) -> None:
-    """Validate Bearer token. Skipped when BIMORYN_API_KEY is not set (dev mode)."""
-    if not _API_KEY:
+    """Validate Bearer token. Skipped when no API keys are configured (dev mode)."""
+    if not _VALID_KEYS:
         return  # auth disabled — local/dev mode
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(
@@ -67,7 +86,7 @@ async def _require_auth(authorization: Annotated[str | None, Header()] = None) -
             detail={"error": "Unauthorized", "code": "AUTH_MISSING", "details": "Authorization header required"},
         )
     token = authorization[len("Bearer "):]
-    if token != _API_KEY:
+    if token not in _VALID_KEYS:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail={"error": "Forbidden", "code": "AUTH_INVALID", "details": "Invalid API key"},
