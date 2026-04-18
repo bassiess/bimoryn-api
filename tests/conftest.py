@@ -7,9 +7,10 @@ never depend on checked-in binary files.
 from __future__ import annotations
 
 import uuid
-import pytest
+
 import ifcopenshell
 import ifcopenshell.api
+import pytest
 
 
 def _guid() -> str:
@@ -23,7 +24,7 @@ def minimal_model() -> ifcopenshell.file:
     project = ifcopenshell.api.run("root.create_entity", model, ifc_class="IfcProject", name="TestProject")
     ifcopenshell.api.run("unit.assign_unit", model)
 
-    context = ifcopenshell.api.run("context.add_context", model, context_type="Model")
+    ifcopenshell.api.run("context.add_context", model, context_type="Model")
 
     site     = ifcopenshell.api.run("root.create_entity", model, ifc_class="IfcSite", name="Site")
     building = ifcopenshell.api.run("root.create_entity", model, ifc_class="IfcBuilding", name="Building")

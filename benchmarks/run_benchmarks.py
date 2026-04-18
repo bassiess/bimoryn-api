@@ -30,7 +30,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 import time
 import tracemalloc
@@ -44,11 +43,9 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from bimoryn.engine import Engine, EngineConfig
-from bimoryn.rules import REGISTRY
-
-import benchmarks.generate_fixtures as gen_fixtures
-
+import benchmarks.generate_fixtures as gen_fixtures  # noqa: E402
+from bimoryn.engine import Engine  # noqa: E402
+from bimoryn.rules import REGISTRY  # noqa: E402
 
 BENCHMARK_DIR = Path(__file__).parent
 FIXTURES_DIR  = BENCHMARK_DIR / "fixtures"
@@ -171,17 +168,17 @@ def _check_budget(size: str, e2e: dict[str, Any], budget: dict) -> list[str]:
 
 def _render_table(report: dict[str, Any]) -> None:
     try:
-        from rich.table import Table
-        from rich.console import Console
+        from rich.console import Console  # noqa: F401
+        from rich.table import Table  # noqa: F401
         _render_rich(report)
     except ImportError:
         _render_plain(report)
 
 
 def _render_rich(report: dict[str, Any]) -> None:
-    from rich.table import Table
-    from rich.console import Console
     from rich import box
+    from rich.console import Console
+    from rich.table import Table
 
     console = Console()
     console.print(f"\n[bold]BIMoryn Benchmark Report[/bold]  {report['generated_at']}\n")
@@ -250,14 +247,14 @@ def _render_plain(report: dict[str, Any]) -> None:
 
 def _write_markdown(report: dict[str, Any], path: Path) -> None:
     lines = [
-        f"# BIMoryn — Performance Benchmark Report",
-        f"",
+        "# BIMoryn — Performance Benchmark Report",
+        "",
         f"Generated: {report['generated_at']}  |  Engine version: {report['engine_version']}",
-        f"",
-        f"## End-to-end Results",
-        f"",
-        f"| Size | Elements | Avg ms | Min ms | Max ms | Peak MB | Elem/s | Issues | Budget |",
-        f"|------|----------|--------|--------|--------|---------|--------|--------|--------|",
+        "",
+        "## End-to-end Results",
+        "",
+        "| Size | Elements | Avg ms | Min ms | Max ms | Peak MB | Elem/s | Issues | Budget |",
+        "|------|----------|--------|--------|--------|---------|--------|--------|--------|",
     ]
     for size, data in report["sizes"].items():
         e = data["e2e"]
@@ -269,11 +266,11 @@ def _write_markdown(report: dict[str, Any], path: Path) -> None:
         )
 
     lines += [
-        f"",
-        f"## Slowest Rules (avg across sizes)",
-        f"",
-        f"| Rule ID | Avg ms |",
-        f"|---------|--------|",
+        "",
+        "## Slowest Rules (avg across sizes)",
+        "",
+        "| Rule ID | Avg ms |",
+        "|---------|--------|",
     ]
     all_rules: dict[str, list[float]] = {}
     for data in report["sizes"].values():
@@ -293,11 +290,11 @@ def _write_markdown(report: dict[str, Any], path: Path) -> None:
                 lines.append(f"- **{size}**: {v}")
 
     lines += [
-        f"",
-        f"## Performance Budget",
-        f"",
-        f"| Size | Max ms | Max MB |",
-        f"|------|--------|--------|",
+        "",
+        "## Performance Budget",
+        "",
+        "| Size | Max ms | Max MB |",
+        "|------|--------|--------|",
     ]
     for size, b in report.get("budget", {}).items():
         lines.append(f"| {size} | {b.get('max_duration_ms', '—')} | {b.get('max_memory_mb', '—')} |")

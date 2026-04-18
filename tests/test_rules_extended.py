@@ -8,12 +8,11 @@ verify the rule is silent on valid data.
 from __future__ import annotations
 
 import uuid
-import pytest
+
 import ifcopenshell
 import ifcopenshell.api
 
 from bimoryn.engine import Engine, EngineConfig
-from bimoryn.models import Severity
 from bimoryn.rules import REGISTRY
 
 
@@ -68,8 +67,8 @@ def test_ge002_fires_on_zero_length_wall(tmp_path):
                             Name="Qto_WallBaseQuantities")
     qty = m.create_entity("IfcQuantityLength", Name="Length", LengthValue=0.0)
     qset.Quantities = [qty]
-    rel = m.create_entity("IfcRelDefinesByProperties", GlobalId=_guid(),
-                          RelatedObjects=[wall], RelatingPropertyDefinition=qset)
+    m.create_entity("IfcRelDefinesByProperties", GlobalId=_guid(),
+                    RelatedObjects=[wall], RelatingPropertyDefinition=qset)
 
     issues = _issues_for("GE-002", m, tmp_path)
     assert len(issues) >= 1
@@ -501,7 +500,7 @@ def test_pm007_no_false_positive_when_thickness_set(tmp_path):
 
 def test_pm008_fires_when_no_owner_history(tmp_path):
     m = ifcopenshell.file(schema="IFC4")
-    project = m.create_entity("IfcProject", GlobalId=_guid(), Name="NoOwner")
+    m.create_entity("IfcProject", GlobalId=_guid(), Name="NoOwner")
     # No OwnerHistory set
 
     issues = _issues_for("PM-008", m, tmp_path)
