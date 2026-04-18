@@ -1,0 +1,29 @@
+name: Uptime Monitor
+
+# Pings /health every 15 minutes. Fails the workflow (→ GitHub email alert) if
+# the API is down. Keeps the Fly.io machine warm and gives us instant outage detection.
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # every 15 minutes
+  workflow_dispatch:           # allow manual trigger for on-demand check
+
+jobs:
+  health-check:
+    name: Ping /health
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check API health
+        run: |
+          echo "Checking https://bimoryn-api.fly.dev/health ..."
+          HTTP_STATUS=$(curl -s -o /tmp/health_body.json -w "%{http_code}" \
+            --max-time 15 \
+            https://bimoryn-api.fly.dev/health)
+          echo "HTTP status: $HTTP_STATUS"
+          cat /tmp/health_body.json || true
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "::error::API is DOWN — /health returned $HTTP_STATUS"
+            exit 1
+          fi
+          echo "API is UP."

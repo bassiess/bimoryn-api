@@ -22,8 +22,6 @@ jobs:
   deploy:
     name: Deploy to Fly.io
     runs-on: ubuntu-latest
-    # Skip silently if the secret is not yet configured
-    if: secrets.FLY_API_TOKEN != ''
 
     steps:
       - name: Checkout
